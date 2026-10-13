@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: laser-backend
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: python manage.py migrate --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120
+    healthCheckPath: /api/status/
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.14
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: DATABASE_PATH
+        value: /tmp/laser-showcase.sqlite3
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: GOOGLE_SHEET_ID
+        sync: false
+      - key: GOOGLE_OAUTH_TOKEN_FILE
+        value: /etc/secrets/oauth-token.json
